@@ -1,16 +1,18 @@
 # RBRproc
 
-A collection of matlab routines to process RBR profiler data (eg RBR
+A collection of Matlab routines to process RBR profiler data (eg RBR
 concerto).  The approach here largely resembles the processing chain
-used by Seabird profilers, except that the parameters are tuned for 
+used by Seabird profilers, except that the parameters are tuned for
 RBR profilers.
 
-It makes use of 
+At the moment it uses RSKtools software to read raw 'rsk' sqlite files
+into Matlab.  The output is converted into a multidimensional
+structure.  This structure is then used as input to the various
+routines.  It has a crude processing log.
 
 
 
-## requires 
-[RSKtools](http://www.rbr-global.com/support/matlab-tools)
+## requires [RSKtools](http://www.rbr-global.com/support/matlab-tools)
 [(Github page here)](https://github.com/RBRglobal/RSKtools)
 
 
@@ -19,20 +21,23 @@ It makes use of
 ## Example usage:
 
 ```matlab
-rsk = RSKopen(rskfile); % from RSKtools
+% read logger data into Matlab using RSKtools
+rsk = RSKopen(rskfile);
 rsk = RSKreaddata(rsk);
 ```
 
 
 ```matlab
-rbr = rbrExtractVals(rsk); % puts things in a friendly structure
+% puts things in a friendly 1 x Ncast structure
+rbr = rbrExtractVals(rsk); 
 
-profile = rbr(4);  % extract the 4th profile for an example
+% extract the 4th profile for this example
+profile = rbr(4);  
 
 % low pass filter T/C
 profile = filterRBR(profile);
 
-%  lag conductivity to reduce salinity spiking
+%  lag conductivity by 2 scans to reduce salinity spiking
 profile = alignRBR(profile,2);
 
 % now re-calculate practical salinity
