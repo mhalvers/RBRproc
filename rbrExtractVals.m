@@ -1,21 +1,15 @@
 function casts = rbrExtractVals(profile,upDownOrBoth);
 
-% takes the output from profile = RSKreaddata(rsk);
+% Takes the output structure from RSKreaddata(rskfile)
 % and converts it into a useful structure
-% also extracts individual casts 
+%
+% Converts it into a ncast x 1 structure with easily
+% accessible data.
+%
+% Uses time record to find large gaps to delineate 
+% individual profiles.
 
 
-% cd ~/research/hakai/seabird
-% close all
-% clear all
-% 
-% path = ['/Users/Mark/Google Drive/Calvert Marine Data/CTD-Data-2014/CTD-hex/'];
-% % pfile = '080217_20140914_1222.rsk'; %different than following file
-% pfile = '080217_20140330_1727.rsk';
-% 
-% rsk = RSKopen([path pfile]);
-% profile = RSKreaddata(rsk);
-% 
 % upDownOrBoth = 'both'; % only one that works now
 % % upDownOrBoth = 'up';
 % % upDownOrBoth = 'down';
@@ -69,8 +63,10 @@ switch (lower(upDownOrBoth(1:2)))
 end
 
 if isfield(rbr,'profiles'),
+    
     tstart =  rbr.profiles.(strt).tstart;
     tend   =  rbr.profiles.(endt).tend;
+    
 else
 
     ind = find(diff(rbr.mtime)>10/60/24);
@@ -82,15 +78,9 @@ else
     
 end
 
-% clf
-% plot(rbr.mtime,rbr.Pressure,'o')
-% fillMarkers
-% hold on
-% plot([tstart'; tstart'],repmat(get(gca,'ylim')',1,length(tstart)),'b')
-% plot([tend'; tend'],repmat(get(gca,'ylim')',1,length(tend)),'r')
 
 
-%% transform into multidimensional structure, 1 x ncast
+%% transform into multidimensional structure, ncast x 1
 
 % t_end works, but not t_start, so only use t_end
 for k = 1:length(tend),
@@ -121,6 +111,4 @@ for k = 1:length(tend),
     
 end
 
-%k = 9;
-%plot(casts(k).mtime,casts(k).Pressure,'o')
 
