@@ -5,20 +5,26 @@ concerto).  The approach here largely resembles the processing chain
 used by Seabird profilers, except that the parameters are tuned for
 RBR profilers.
 
-At the moment it uses RSKtools software to read raw 'rsk' sqlite files
-into Matlab.  The output is converted into a multidimensional
-structure.  This structure is then used as input to the various
-routines.  It has a crude processing log.
+At the moment it users are required to use RSKtools to read raw 'rsk'
+sqlite files into Matlab.  The output structure is then converted into
+a multidimensional structure.  This structure is then used as input to
+the various routines.  It has a crude processing log.
 
 
 
-## requires [RSKtools](http://www.rbr-global.com/support/matlab-tools)
-[(Github page here)](https://github.com/RBRglobal/RSKtools)
+## Requirements
+
+### RSKtools
+
+[RBR Global link](http://www.rbr-global.com/support/matlab-tools)
+
+[Github page](https://github.com/RBRglobal/RSKtools)
 
 
-[Gibbs SeaWater Matlab tool box](http://www.teos-10.org/software.htm)
+### Gibbs SeaWater Matlab tool box
+[TEOS-10 link](http://www.teos-10.org/software.htm)
 
-## Example usage:
+## Example usage
 
 ```matlab
 % read logger data into Matlab using RSKtools
@@ -38,7 +44,7 @@ profile = rbr(4);
 profile = filterRBR(profile);
 
 %  lag conductivity by 2 scans to reduce salinity spiking
-profile = alignRBR(profile,2);
+profile = alignRBR(profile,'Conductivity',-2);
 
 % now re-calculate practical salinity
 profile.Salinity = gsw_SP_from_C(profile.Conductivity,....
@@ -56,3 +62,5 @@ profile = despikeRBR(profile,{'Fluorometer','Turbidity'},'median',11,'NaN');
 profile = binRBR(profile,'pressure',1);
 
 ```
+
+## Laundry list
