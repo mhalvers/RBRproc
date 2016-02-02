@@ -40,8 +40,8 @@ rbr = rbrExtractVals(rsk);
 % extract the 4th profile for this example
 profile = rbr(4);  
 
-% low pass filter T/C
-profile = filterRBR(profile);
+% low pass filter (filtfilt) T/C with running 3 pt triangular window
+profile = filterRBR(profile,{'Temperature','Conductivity'},3);
 
 %  lag conductivity by 2 scans to reduce salinity spiking
 profile = alignRBR(profile,'Conductivity',-2);
