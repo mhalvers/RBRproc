@@ -1,28 +1,44 @@
-function [out] = filterRBR(in,fields)
+function [out] = filterRBR(in,vars,np)
 
-% hardwired to use 3 point triangle window FIR
-% on conductivity and temperature
+% filterRBR applies FIR low-pass filter to sensor data
 %
-% In the future, specify fields, or use IIR filter.
+%  usage: out = filterRBR(in,vars,np);
+%
+%   where:
+%      in          : structure of rbr data (ie output from rbrExtractVals.m)
+%      vars        : cell array of variables to filter. 'all' for all sensors 
+%      np          : filter parameter
+%
+%     If 'np' is a scalar, specifies the length of a triangular window
+%     If 'np' is a vector, then this is the window applied to the data
+%     - eg hamming(21)/sum(hamming(21))
+%
+%     note - filterRBR is configured to use filtfilt to produce a
+%     zero-phase response.  Should probably include the option to call
+%     filter to produce phase shifted output (useful for matching
+%     sensor time constants?).
+
+%% set up filter
+
+if numel(np)==1,
+
+    fltr = triang(np)/sum(triang(np));fltr = fltr(:);
+    
+else
+    
+    fltr = np(:);
+    
+end
 
 
 out = in;
 
+for k=1:length(vars),
 
-% filter conductivity to match temperature response
-np = 3;  
-fltr = triang(np)/sum(triang(np));fltr = fltr(:);
+    out.(vars{k}) = filtfilt(fltr,1,in.(vars{k}));
 
-out.Conductivity = filtfilt(fltr,1,in.Conductivity);
+end
 
-% filter temperature to ensure a match
-out.Temperature =  filtfilt(fltr,1,in.Temperature);
-
-
-%% filter pressure
-% np = 5; % for pressure
-% fltr = triang(np)/sum(triang(np));fltr = fltr(:);
-% out.Pressure = filtfilt(fltr,1,in.Pressure);
 
 
 % IIR butterworth
@@ -31,7 +47,7 @@ out.Temperature =  filtfilt(fltr,1,in.Temperature);
 % fcon2 = filtfilt(b,a,con);
 
 
-out.processingLog = {['Temperature and conductivty low pass filtered with '...
+out.processingLog = {[vars ' filtered with '...
                      num2str(np) ' point triangular window']};
 
 

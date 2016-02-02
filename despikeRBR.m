@@ -4,7 +4,7 @@ function out = despikeRBR(in,vars,algorithm,np,replacewith)
 % out = despikeRBR(in,vars,algorithm,np,replacewith,val)
 %
 %  where:
-%    in          : structure of rbr data (ie output from rbrExtractVals.m)    
+%    in          : structure of rbr data (ie output from rbrExtractVals.m)   
 %    vars        : cell array of variables to filter. 'all' for all sensors
 %    algorithm   : one of 'median' or 'mean'
 %    np          : number of points in running mean/median
@@ -66,8 +66,11 @@ for j = 1:length(fnames)
     end
 
     % pick out the offenders
-    thresh = 3*nanstd(tvar - ftvar);
-    jj = tvar - ftvar >= thresh;
+    
+    res = tvar - ftvar;
+    
+    thresh = 3*nanstd(res);
+    jj = res >= thresh;
     
 
     switch replacewith
