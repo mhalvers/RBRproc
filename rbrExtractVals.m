@@ -7,8 +7,15 @@ function casts = rbrExtractVals(profile,upDownOrBoth);
 % accessible data.
 %
 % Uses time record to find large gaps to delineate 
-% individual profiles.
-
+% individual profiles.  This is rather crude and it
+% will most certainly fail.  Also, it selects both
+% the up and down casts.  Use trimRBR to parse casts
+% further.
+%
+% Currently also subracts 10.1325 dbar from the total
+% pressure to form sea pressure.  This should probably
+% be moved to another function, or at least be an
+% input variable.
 
 % upDownOrBoth = 'both'; % only one that works now
 % % upDownOrBoth = 'up';
