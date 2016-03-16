@@ -46,17 +46,19 @@ profile = filterRBR(profile,{'Temperature','Conductivity'},3);
 % lag conductivity by 0.33 seconds (2 scans at 6 Hz) to reduce salinity spiking
 profile = alignRBR(profile,'Conductivity',-2/6);
 
-% now re-calculate practical salinity
-profile.Salinity = gsw_SP_from_C(profile.Conductivity,....
-                                 profile.Temperature,...
-                                 profile.Pressure);
+% now calculate practical salinity
+profile = rmfield(profile,'Salinity'); % remove RBR's calculation
+
+profile.PracticalSalinity = gsw_SP_from_C(profile.Conductivity,....
+                                          profile.Temperature,...
+                                          profile.Pressure);
 
 % interactive function to choose start and end points of profile
 profile = trimRBR(profile);
 
 % despike the fluorometer and turbidity profiles.  Use an 11 point
 % median filter to find the spikes, and replace them with NaN
-profile = despikeRBR(profile,{'Fluorometer','Turbidity'},'median',11,'NaN');
+profile = despikeRBR(profile,{'Chlorophyll','Turbidity'},'median',11,'NaN');
 
 %% bin average all variables by pressure into 1 dbar bins
 profile = binRBR(profile,'pressure',1);
