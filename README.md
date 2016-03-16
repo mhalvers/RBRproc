@@ -43,8 +43,8 @@ profile = rbr(4);
 % low pass filter (filtfilt) T/C with running 3 pt triangular window
 profile = filterRBR(profile,{'Temperature','Conductivity'},3);
 
-%  lag conductivity by 2 scans to reduce salinity spiking
-profile = alignRBR(profile,'Conductivity',-2);
+% lag conductivity by 0.33 seconds (2 scans at 6 Hz) to reduce salinity spiking
+profile = alignRBR(profile,'Conductivity',-2/6);
 
 % now re-calculate practical salinity
 profile.Salinity = gsw_SP_from_C(profile.Conductivity,....
