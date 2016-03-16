@@ -1,21 +1,18 @@
 function casts = rbrExtractVals(profile,upDownOrBoth);
 
-% Takes the output structure from RSKreaddata(rskfile)
-% and converts it into a useful structure
+% Takes the output structure from RSKreaddata(rskfile) and converts it
+% into a useful structure.
 %
-% Converts it into a ncast x 1 structure with easily
-% accessible data.
+% Converts it into a ncast x 1 structure with easily accessible data.
 %
-% Uses time record to find large gaps to delineate 
-% individual profiles.  This is rather crude and it
-% will most certainly fail.  Also, it selects both
-% the up and down casts.  Use trimRBR to parse casts
-% further.
+% Uses time record to find large gaps to delineate individual
+% profiles.  This is rather crude and it will most certainly fail
+% under some circumstances.  Use trimRBR to select downcasts and
+% upcasts.
 %
-% Currently also subracts 10.1325 dbar from the total
-% pressure to form sea pressure.  This should probably
-% be moved to another function, or at least be an
-% input variable.
+% Currently also subtracts 10.1325 dbar from the total pressure to
+% form sea pressure.  This should probably be moved to another
+% function, or at least be an input variable.
 
 % upDownOrBoth = 'both'; % only one that works now
 % % upDownOrBoth = 'up';
@@ -25,8 +22,10 @@ if nargin==1,
   upDownOrBoth = 'both';
 end
 
+%% create a temporary structure with relavant info in a simpler format
 
-
+rbr.fileName = profile.deployments.name;
+rbr.samplingPeriod = profile.schedules.samplingPeriod/1000; % seconds
 rbr.mtime = profile.data.tstamp;
 rbr.units = profile.data.units;
 rbr.serialID = num2str(profile.instruments.serialID);
@@ -98,10 +97,13 @@ for k = 1:length(tend),
         kk = rbr.mtime>tend(k-1) & rbr.mtime<tend(k);
     end
     
+    casts(k).fileName = rbr.fileName;
     casts(k).units = rbr.units;
     casts(k).serialID = rbr.serialID;
     casts(k).model = rbr.model;
     casts(k).tzone = '?';
+    casts(k).samplingPeriod = rbr.samplingPeriod;
+    casts(k).mtime = rbr.mtime(kk);
     
     if isfield(rbr,'profiles'),
         casts(k).profiles.downcast.tstart = rbr.profiles.downcast.tstart(k);
@@ -110,7 +112,7 @@ for k = 1:length(tend),
         casts(k).profiles.upcast.tend = rbr.profiles.upcast.tend(k);
     end
     
-    casts(k).mtime = rbr.mtime(kk);
+
     
     for j = 1:length(vars),
       casts(k).(vars{j}) = rbr.(vars{j})(kk);    
