@@ -6,17 +6,20 @@ function [out] = filterRBR(in,vars,np)
 %
 %   where:
 %      in          : structure of rbr data (ie output from rbrExtractVals.m)
-%      vars        : cell array of variables to filter. 'all' for all sensors 
+%      vars        : cell array of variables to filter.
 %      np          : filter parameter
 %
-%     If 'np' is a scalar, specifies the length of a triangular window
-%     If 'np' is a vector, then this is the window applied to the data
-%     - eg hamming(21)/sum(hamming(21))
+%     If 'np' is a scalar, specifies the length (in points) of a
+%     triangular window.  If 'np' is a vector, then it is taken to be
+%     the window function to be applied to the data - eg
+%     hamming(21)/sum(hamming(21)).
 %
-%     note - filterRBR is configured to use filtfilt to produce a
-%     zero-phase response.  Should probably include the option to call
-%     filter to produce phase shifted output (useful for matching
-%     sensor time constants?).
+%     note - filterRBR uses filtfilt to produce a zero-phase response.
+%     One might choose to call filter with a IIR-type filter to match
+%     sensor time constants.  However, the lag produced by a sensor's
+%     time-dependent response can be accounted for by simply shifting
+%     the sensor in time (eg with alignRBR.m)
+
 
 %% set up filter
 
@@ -33,6 +36,11 @@ end
 
 out = in;
 
+if ischar(vars),
+  vars = cellstr(vars);    
+end
+
+
 for k=1:length(vars),
 
     out.(vars{k}) = filtfilt(fltr,1,in.(vars{k}));
@@ -41,13 +49,19 @@ end
 
 
 
-% IIR butterworth
-% [b,a] = butter(1,.5); % 1st order, 3 Hz cutoff (Wn = 3/6*2pi)
-% freqz(b,a)
-% fcon2 = filtfilt(b,a,con);
+if numel(vars)>1,
+    vars = strjoin(vars,', ');
+end
+if numel(np)==1,
+    wdw = 'triangle';
+else
+    wdw = 'custom';
+    np = length(np);
+end
 
 
-out.processingLog = {[vars ' filtered with '...
-                     num2str(np) ' point triangular window']};
+
+out.processingLog = {[char(vars) ' filtered with '...
+                     num2str(np) ' point ' wdw ' window']};
 
 
