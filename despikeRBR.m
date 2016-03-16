@@ -5,7 +5,8 @@ function out = despikeRBR(in,vars,algorithm,np,replacewith)
 %
 %  where:
 %    in          : structure of rbr data (ie output from rbrExtractVals.m)   
-%    vars        : cell array of variables to filter. 'all' for all sensors
+%    vars        : cell array of strings describing which variables
+%                  to filter
 %    algorithm   : one of 'median' or 'mean'
 %    np          : number of points in running mean/median
 %    replacewith : How to treat the flagged values:
@@ -15,40 +16,17 @@ function out = despikeRBR(in,vars,algorithm,np,replacewith)
 %                :     'NaN'      - replace flagged values with NaN
 %
 
-ind = [];
-if strcmp(vars,'all'),
 
-    fnames = fieldnames(in);
-    
-    for k=1:length(fnames),
-      if isnumeric(in.(fnames{k})),
-        ind = [ind; k];
-      end
-    end
-
-    fnames = fnames(ind);
- 
-    ind = ~strcmp('mtime',fnames);
-    fnames = fnames(ind);
-
-elseif ischar(vars),
-
-    fnames = {vars};
-
-else
-
-    fnames = vars;
-    
+if ischar(vars),
+    vars = cellstr(vars);
 end
-
-
 
 out = in;
 
 
-for j = 1:length(fnames)
+for j = 1:length(vars)
 
-    tvar = in.(fnames{j});
+    tvar = in.(vars{j});
 
     switch algorithm
         
@@ -76,16 +54,16 @@ for j = 1:length(fnames)
     switch replacewith
   
       case 'filtered'
-        out.(fnames{j}) = ftvar;
+        out.(vars{j}) = ftvar;
         
       case 'interp'
         
         tvar = interp1(in.mtime(~jj),tvar(~jj),in.mtime);
-        out.(fnames{j}) = tvar;
+        out.(vars{j}) = tvar;
     
       case 'NaN'
         tvar(jj) = NaN;
-        out.(fnames{j}) = tvar;
+        out.(vars{j}) = tvar;
             
     end
 
@@ -93,7 +71,13 @@ end
 
 
 
+if numel(vars)>1,
+    vars = strjoin(vars,', ');
+end
+
+
 nlog = length(out.processingLog);
-out.processingLog(nlog+1) = {['De-spiking applied to with ' num2str(np) [' ' ...
-                    'point '] algorithm ' algorithm.  Bad values ' ...
-                    'treated with ' replacewith '.']};
+out.processingLog(nlog+1) = {['De-spiking applied to ' char(vars) ...
+                    ' with ' num2str(np) ' point ' algorithm  ...
+                    ' algorithm.  Bad values treated with ' ...
+                    replacewith '.']};
