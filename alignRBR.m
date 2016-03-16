@@ -1,66 +1,66 @@
-function out = alignRBR(in,vars,nscan)
+function out = alignRBR(in,vars,tau)
 
-% Align the sensor data by advancing or lagging by a user-defined
-% number of scans.  A positive scan shift advances the variable in
-% time, whereas a negative value delays the value.  The scans at the
-% beginning/end of the array are padded with NaNs.
+% Advance or lag sensor in time by a user-defined number of seconds.
+% A positive value advances the variable in time, whereas a negative
+% value delays the variable.  The scans at the beginning/end of the
+% array are padded with NaNs.  Advance time is translated into the
+% equivalent number of integer scans using the instrument sampling
+% period.  Shifting by a fraction of a scan is not supported at this
+% time.
 %
+% Usage:
 %
-% At the moment it only lags the sensor(s).
-%
-%  out = alignRBR(in,vars,nscan)
+%  out = alignRBR(in,vars,tau)
 %
 %   where:
-%     in         : structure of rbr data (ie output from rbrExtractVals.m)
-%     vars       : cell array of variables to filter.
-%     nscan      : number of (integer) scans
+%     in         : structure of rbr data created by output from 
+%                  rbrExtractVals.m
+%     vars       : cell array of strings describing which variables 
+%                  to filter
+%     tau        : time shift in seconds
 %
-%   Most common use is to shift Temperature and/or Conductivity relative to 
-%   Pressure.  Pressure and Temperature are (physically) close together, and 
-%   thus matched closely in time.  Water sample is sensed by Conductivity
-%   before Pressure and Temperature.
-%   
-%   Typical delay of C relative to T and P is -2 scans.
+% Most common use is to shift temperature and/or conductivity relative
+% to pressure.  The pressure and temperature are (physically) close
+% together, and thus matched closely in time.  
 %
-%   Mark Halverson 
-%   29 Dec 2015 V0.9
-%   28 Jan 2016 V1.0
-
-if nscan~=fix(nscan),
-    error('Number of scans must be an integer.')
-end
+% In most (?) RBR profilers, a water sample is sampled by the
+% conductivity sensor before the pressure and temperature sensors.
+% Thus conductiviy must be delayed relative to temperature and
+% pressure.  The typical delay of conductivity relative to temperature
+% and pressure for a 6 Hz profiler is -0.3 seconds, or -2 scans.
 
 
-if ischar(vars),
+% translate from time to scans
+nscan = round(tau./in.samplingPeriod);
 
-    fnames = {vars};
-    
-else
-    
-    fnames = vars;
-    
-end
 
 
 out = in;
 
-for k=1:length(fnames),
+if ischar(vars),
+    vars = cellstr(vars);
+end
+
+for k=1:length(vars),
     
     if nscan<0,  % delay
 
         nscan = abs(nscan);
-        out.(fnames{k}) = cat(1,NaN(nscan,1),in.(fnames{k})(1:end-nscan));
+        out.(vars{k}) = cat(1,NaN(nscan,1),in.(vars{k})(1:end-nscan));
     
     elseif nscan>0, % advance
         
-        out.(fnames{k}) = cat(1,in.(fnames{k})(nscan:end),NaN(nscan,1));
+        out.(vars{k}) = cat(1,in.(vars{k})(nscan+1:end),NaN(nscan,1));
     
     end
     
 end
 
 
+if numel(vars)>1,
+    vars = strjoin(vars,', ');
+end
 
 nlog = length(out.processingLog);
-out.processingLog(nlog+1) = {[vars ' shifted by ' num2str(nscan) ' scans relative to Pressure']};
+out.processingLog(nlog+1) = {[char(vars) ' shifted by ' num2str(round(100*tau)/100) ' seconds']};
 
