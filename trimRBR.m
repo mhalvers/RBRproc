@@ -1,4 +1,19 @@
-function out = trimRBR(in,ind),
+function [out,ind] = trimRBR(in,ind),
+
+% trimRBR discards scans from an RBR profile.  
+%
+%  usage: out = trimRBR(in,ind);
+%
+%   where:
+%      in          : structure of rbr data (ie output from 
+%                  : rbrExtractVals.m)
+%      ind         : If known, optional vector of indices to retain.  
+%
+%      If ind is not specified, trimRBR launches a (crude) interactive
+%      window prompting the user to select the cast limits by hand.
+%      The indices selected with the gui are then provided as an
+%      output.
+%
 
 out = in;
 
@@ -43,17 +58,17 @@ end
 for k = 1:length(in)
     ind = ceil(xs(k)):floor(xe(k));
 
-    fnames = fieldnames(in(k));
+    vars = fieldnames(in(k));
     %cls = structfun(@isnumeric,in,'uniformoutput',false);
 
-    for j = 1:length(fnames)
-        if isnumeric(in.(fnames{j})),
-            out.(fnames{j}) = in.(fnames{j})(ind);
+    for j = 1:length(vars)
+        if isnumeric(in.(vars{j})) & numel(in.(vars{j}))>1,
+            out.(vars{j}) = in.(vars{j})(ind);
         end
     end
 
     nlog = length(out(k).processingLog);
-    out(k).processingLog(nlog+1) = {['Profiles trimmed']};
+    out(k).processingLog(nlog+1) = {['Profile trimmed']};
 
 end
 
