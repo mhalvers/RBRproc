@@ -4,56 +4,58 @@ function out = binRBR(in,by,binWidth)
 %
 %  out = binRBR(in,by,binWidth);
 %
-%   where 'in' is the RBR structure
-%         'by' is a string specifying how toh
-%              bin the data ('depth' or 'pressure')
-%         'binWidth' is the bin width
+%   where 
+%     in        : structure of rbr data created by output from
+%                 rbrExtractVals.m
+%     by        : is a string specifying how to bin the  data 
+%                 ('depth' or 'pressure')
+%     binWidth  : is the bin width
 %
-%   note: if by = 'depth' then depth is calculated
-%         from pressure and latitude using the GSW 
+%   note: if by = 'depth', and depth hasn't yet been calculated, then
+%         depth is calculated from pressure and latitude using the GSW
 %         function gsw_z_from_p
 
-
+ 
 %% for testing
 % in = profile; 
-% by = 'depth';
-% % by = 'pressure';
+% % by = 'depth';
+% by = 'pressure';
 % binWidth = 1;
+ 
 
-out = in;
-
-
-unit = 'dbar'; % for processing log text
-
-if strcmp(by,'depth'),
-  in.Depth = -gsw_z_from_p(in.Pressure,52);
-  in.units(end+1) = {'m'};
-  % in = orderfields(in,'processingLog',length(fieldnames(in)))
-  unit = 'm'; % for processing log text
-end
-
-
+%% develop a list of sensors to bin
 vars = fieldnames(in);
 ind = [];
 for k=1:length(vars),
-    if isnumeric(in.(vars{k})),
+    if isnumeric(in.(vars{k})) & numel(in.(vars{k}))>1,
         ind = [ind; k];
     end
 end
 vars = vars(ind);
 
+% of course we don't want to bin pressure or depth
+vars = vars(~strcmp(vars,{'Pressure'}));
+vars = vars(~strcmp(vars,{'Depth'}));
+
+
+
+out = in;
 
 switch by
   case 'pressure'
-    binCenter = [1:binWidth:ceil(max(in.Pressure))]';
+    binCenter = [binWidth:binWidth:ceil(max(in.Pressure))]';
     out.Pressure = binCenter;
-    vars = vars(~strcmp(vars,'Pressure'));
+    out.Depth = -gsw_z_from_p(out.Pressure,52);
+    unit = 'dbar'; % for processing log text  
   case 'depth'
-    binCenter = [1:binWidth:ceil(max(in.Depth))]';
+    in.Depth = -gsw_z_from_p(in.Pressure,52);
+    binCenter = [binWidth:binWidth:ceil(max(in.Depth))]';
     out.Depth = binCenter;
-    vars = vars(~strcmp(vars,'Depth'));
     out.Pressure = gsw_p_from_z(-out.Depth,52);
+    unit = 'm'; % for processing log text
 end
+out.units(end+1) = {'m'};
+
 
 
 %  initialize the binned output fields    
@@ -83,4 +85,5 @@ end
 
 
 nlog = length(out.processingLog);
-out.processingLog(nlog+1) = {['Data binned by ' by ' to ' num2str(binWidth) ' ' unit]};
+out.processingLog(nlog+1) = {['Data binned by ' by ' to ' num2str(binWidth) ...
+                    ' ' unit ' intervals']};
