@@ -21,7 +21,7 @@ function out = binRBR(in,by,binWidth)
 % % by = 'depth';
 % by = 'pressure';
 % binWidth = 1;
- 
+  
 
 %% develop a list of sensors to bin
 vars = fieldnames(in);
