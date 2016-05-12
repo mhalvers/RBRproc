@@ -66,3 +66,5 @@ profile = binRBR(profile,'pressure',1);
 ```
 
 ## Laundry list
+
+1. Modify despikeRBR.m to operate on blocks of data.
