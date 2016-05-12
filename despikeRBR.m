@@ -1,7 +1,7 @@
-function out = despikeRBR(in,vars,algorithm,np,replacewith)
+function out = despikeRBR(in,vars,algorithm,np,replaceWith)
 
 % usage: 
-% out = despikeRBR(in,vars,algorithm,np,replacewith,val)
+% out = despikeRBR(in,vars,algorithm,np,replaceWith,val)
 %
 %  where:
 %    in          : structure of rbr data (ie output from rbrExtractVals.m)   
@@ -9,7 +9,7 @@ function out = despikeRBR(in,vars,algorithm,np,replacewith)
 %                  to filter
 %    algorithm   : one of 'median' or 'mean'
 %    np          : number of points in running mean/median
-%    replacewith : How to treat the flagged values:
+%    replaceWith : How to treat the flagged values:
 %                :   one of 'filtered', 'interp', or 'NaN' 
 %                :     'filtered' - use filtered (mean/median) version
 %                :     'interp'   - linear interpolation over flagged values
@@ -37,8 +37,9 @@ for j = 1:length(vars)
       case 'mean'
          
         fltr = boxcar(np)/sum(boxcar(np));fltr = fltr(:);
-        kk = isfinite(tvar);
         ftvar = tvar;
+        
+        kk = isfinite(ftvar); % quick and dirty handling of NaNs (not great) 
         ftvar(kk) = filtfilt(fltr,1,tvar(kk)); 
 
     end
@@ -47,21 +48,22 @@ for j = 1:length(vars)
     
     res = tvar - ftvar;
     
-    thresh = 3*nanstd(res);
-    jj = res >= thresh;
+    thresh = 4*nanstd(res);
+    jj = abs(res) >= thresh;
     
 
-    switch replacewith
+    switch replaceWith
   
       case 'filtered'
+
         out.(vars{j}) = ftvar;
         
       case 'interp'
-        
-        tvar = interp1(in.mtime(~jj),tvar(~jj),in.mtime);
-        out.(vars{j}) = tvar;
+
+        out.(vars{j}) = interp1(in.mtime(~jj),tvar(~jj),in.mtime);
     
       case 'NaN'
+
         tvar(jj) = NaN;
         out.(vars{j}) = tvar;
             
@@ -80,4 +82,4 @@ nlog = length(out.processingLog);
 out.processingLog(nlog+1) = {['De-spiking applied to ' char(vars) ...
                     ' with ' num2str(np) ' point ' algorithm  ...
                     ' algorithm.  Bad values treated with ' ...
-                    replacewith '.']};
+                    replaceWith '.']};

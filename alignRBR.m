@@ -25,7 +25,7 @@ function out = alignRBR(in,vars,tau)
 %
 % In most (?) RBR profilers, a water sample is sampled by the
 % conductivity sensor before the pressure and temperature sensors.
-% Thus conductiviy must be delayed relative to temperature and
+% Thus conductivity must be delayed relative to temperature and
 % pressure.  The typical delay of conductivity relative to temperature
 % and pressure for a 6 Hz profiler is -0.3 seconds, or -2 scans.
 
