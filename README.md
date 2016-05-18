@@ -1,15 +1,18 @@
 # RBRproc
 
-A collection of Matlab routines to process RBR profiler data (eg RBR
-concerto).  The approach here largely resembles the processing chain
-used by Seabird profilers, except that the parameters are tuned for
-RBR profilers.
+RBRproc is a collection of Matlab routines designed to process RBR
+profiler data (eg, RBR concerto).  The approach here largely resembles
+the processing chain used by Seabird profilers, except that the
+parameters are tuned for RBR profilers.
 
-At the moment it users are required to use RSKtools to read raw 'rsk'
-sqlite files into Matlab.  The output structure is then converted into
-a multidimensional structure.  This structure is then used as input to
-the various routines.  It has a crude processing log.
-
+At the moment the toolbox is designed to use RBR's RSKtools Matlab
+toolbox to read raw 'rsk' sqlite files.  The output structure from
+RSKtools is then converted into a more convenient multidimensional
+structure.  This structure is then used as input to the various
+RBRproc processing routines.  For RBR loggers which output hexadecimal
+files, one could also read any one of the Ruskin outputs (mat, txt,
+Excel, etc) into Matlab and create a structure resembling the output
+of rbrExtractVals.m.
 
 
 ## Requirements
@@ -35,10 +38,12 @@ rsk = RSKreaddata(rsk);
 
 ```matlab
 % puts things in a friendly 1 x Ncast structure
-rbr = rbrExtractVals(rsk); 
+% note that rbrExtractVals converts total pressure to
+% sea pressure by assuming Patm = 10.1325 dbar
+profiles = rbrExtractVals(rsk); 
 
 % extract the 4th profile for this example
-profile = rbr(4);  
+profile = profiles(4);
 
 % low pass filter (filtfilt) T/C with running 3 pt triangular window
 profile = filterRBR(profile,{'Temperature','Conductivity'},3);
@@ -67,4 +72,7 @@ profile = binRBR(profile,'pressure',1);
 
 ## Laundry list
 
-1. Modify despikeRBR.m to operate on blocks of data.
+1. Modify despikeRBR.m to operate on blocks of data instead of full profile.
+2. Remove the atmospheric pressure correction from rbrExtractVals.m
+   and place elsewhere?
+3. Add up/down cast detection to trimRBR.m
