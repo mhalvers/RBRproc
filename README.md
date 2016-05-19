@@ -72,7 +72,8 @@ profile = binRBR(profile,'pressure',1);
 
 ## Laundry list
 
-1. Modify despikeRBR.m to operate on blocks of data instead of full profile.
-2. Remove the atmospheric pressure correction from rbrExtractVals.m
+1. Modify `despikeRBR.m` to operate on blocks of data instead of full profile.
+2. Remove the atmospheric pressure correction from `rbrExtractVals.m`
    and place elsewhere?
-3. Add up/down cast detection to trimRBR.m
+3. Improve the profile detection in `rbrExtractVals.m`.
+4. Add up/down cast detection to `trimRBR.m`.
