@@ -42,12 +42,23 @@ end
 
 
 for k=1:length(vars),
+    
+   fvar = in.(vars{k});
 
-    out.(vars{k}) = filtfilt(fltr,1,in.(vars{k}));
+   % NaN handling
+    
+    kk = isfinite(fvar);
+    nvar = NaN(size(fvar));
+    
+    % apply the filter
+    nvar(kk) = filtfilt(fltr,1,fvar(kk));
+    
+    out.(vars{k}) = nvar;
 
 end
 
 
+%% set up processing log text
 
 if numel(vars)>1,
     vars = strjoin(vars,', ');
