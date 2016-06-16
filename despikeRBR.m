@@ -1,7 +1,8 @@
 function out = despikeRBR(in,vars,algorithm,np,replaceWith)
-
+%
 % usage: 
-% out = despikeRBR(in,vars,algorithm,np,replaceWith,val)
+%
+%   out = despikeRBR(in,vars,algorithm,np,replaceWith)
 %
 %  where:
 %    in          : structure of rbr data (ie output from rbrExtractVals.m)   
@@ -39,7 +40,10 @@ for j = 1:length(vars)
         fltr = boxcar(np)/sum(boxcar(np));fltr = fltr(:);
         ftvar = tvar;
         
-        kk = isfinite(ftvar); % quick and dirty handling of NaNs (not great) 
+        kk = isfinite(ftvar); % quick and dirty handling of NaNs
+                              % (not great) should probably interp, 
+                              % filter, and then re-NaN
+        
         ftvar(kk) = filtfilt(fltr,1,tvar(kk)); 
 
     end
