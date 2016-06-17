@@ -9,10 +9,7 @@ function casts = rbrExtractVals(profile,upDownOrBoth);
 % profiles.  This is rather crude and it will most certainly fail
 % under some circumstances.  Use trimRBR to select downcasts and
 % upcasts.
-%
-% Currently also subtracts 10.1325 dbar from the total pressure to
-% form sea pressure.  This should probably be moved to another
-% function, or at least be an input variable.
+
 
 % upDownOrBoth = 'both'; % only one that works now
 % % upDownOrBoth = 'up';
@@ -52,7 +49,6 @@ for k=1:length(vars),
     rbr.(lbl) = profile.data.values(:,ind);
 
 end
-rbr.Pressure = rbr.Pressure - 10.1325;
 
 
 
@@ -112,12 +108,14 @@ for k = 1:length(tend),
         casts(k).profiles.upcast.tend = rbr.profiles.upcast.tend(k);
     end
     
-
-    
     for j = 1:length(vars),
       casts(k).(vars{j}) = rbr.(vars{j})(kk);    
     end
     
+    casts(k).processingLog = {[rbr.fileName ' converted into RBRproc ' ...
+                    'structure']};
+
+
 end
 
 

@@ -46,7 +46,7 @@ if ~isfield(in,'DescentRate'),
     
     np = 3; % Jen's recommendation
     fltr = boxcar(np)/sum(boxcar(np));fltr = fltr(:);
-    fdepth = filtfilt(fltr,1,out.Depth);
+    fdpth = filtfilt(fltr,1,out.Depth);
     
     out.DescentRate = diff(fdpth)./out.samplingPeriod; % m/s
     

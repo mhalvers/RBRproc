@@ -52,7 +52,7 @@ for k=1:length(vars),
     
     % apply the filter
     nvar(kk) = filtfilt(fltr,1,fvar(kk));
-    
+   
     out.(vars{k}) = nvar;
 
 end
