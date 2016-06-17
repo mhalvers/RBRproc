@@ -37,13 +37,16 @@ rsk = RSKreaddata(rsk);
 
 
 ```matlab
-% puts things in a friendly 1 x Ncast structure
-% note that rbrExtractVals converts total pressure to
-% sea pressure by assuming Patm = 10.1325 dbar
+% puts things in a friendly 1 x Ncast structure. casts are determined
+% by finding large gaps in the time stamps
 profiles = rbrExtractVals(rsk); 
 
 % extract the 4th profile for this example
 profile = profiles(4);
+
+% subtract atmospheric pressure from total pressure
+patm = 9.5;
+profile = rmPatmRBR(profile,patm);
 
 % despike the fluorometer and turbidity profiles.  Use an 11 point
 % median filter to find the spikes, and replace them with NaN
@@ -54,9 +57,6 @@ profile = filterRBR(profile,{'Temperature','Conductivity'},3);
 
 % lag conductivity by 0.33 seconds (2 scans at 6 Hz) to reduce salinity spiking
 profile = alignRBR(profile,'Conductivity',-2/6);
-
-% interactive function to choose start and end points of profile
-profile = trimRBR(profile);
 
 % Identify scans when the descent rate and deceleration were such that
 % hydrodynamic wake may have contaminated the data, and flag with NaN.
@@ -69,6 +69,9 @@ profile.PracticalSalinity = gsw_SP_from_C(profile.Conductivity,....
                                           profile.Temperature,...
                                           profile.Pressure);
 
+% interactive function to choose start and end points of profile
+profile = trimRBR(profile);
+
 %% bin average all variables by pressure into 1 dbar bins
 profile = binRBR(profile,'pressure',1);
 
@@ -76,8 +79,8 @@ profile = binRBR(profile,'pressure',1);
 
 ## Laundry list
 
-1. Modify `despikeRBR.m` to operate on blocks of data instead of full profile.
-2. Remove the atmospheric pressure correction from `rbrExtractVals.m`
-   and place elsewhere (new function?).
-3. Improve the profile detection in `rbrExtractVals.m`.
-4. Add up/down cast detection to `trimRBR.m`.
+1. Modify `despikeRBR.m` to operate on blocks of data instead of full
+   profile.
+2. Improve the cast detection in `rbrExtractVals.m`.  Provide indices
+   to select up and down cast
+
