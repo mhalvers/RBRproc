@@ -55,19 +55,19 @@ profile = filterRBR(profile,{'Temperature','Conductivity'},3);
 % lag conductivity by 0.33 seconds (2 scans at 6 Hz) to reduce salinity spiking
 profile = alignRBR(profile,'Conductivity',-2/6);
 
-% now calculate practical salinity
-profile = rmfield(profile,'Salinity'); % remove RBR's calculation
-
-profile.PracticalSalinity = gsw_SP_from_C(profile.Conductivity,....
-                                          profile.Temperature,...
-                                          profile.Pressure);
-
 % interactive function to choose start and end points of profile
 profile = trimRBR(profile);
 
 % Identify scans when the descent rate and deceleration were such that
 % hydrodynamic wake may have contaminated the data, and flag with NaN.
 profile = loopRBR(profiles,'NaN');
+
+% now calculate practical salinity
+profile = rmfield(profile,'Salinity'); % remove RBR's calculation
+
+profile.PracticalSalinity = gsw_SP_from_C(profile.Conductivity,....
+                                          profile.Temperature,...
+                                          profile.Pressure);
 
 %% bin average all variables by pressure into 1 dbar bins
 profile = binRBR(profile,'pressure',1);
