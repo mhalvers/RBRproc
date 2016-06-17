@@ -45,6 +45,10 @@ profiles = rbrExtractVals(rsk);
 % extract the 4th profile for this example
 profile = profiles(4);
 
+% despike the fluorometer and turbidity profiles.  Use an 11 point
+% median filter to find the spikes, and replace them with NaN
+profile = despikeRBR(profile,{'Chlorophyll','Turbidity'},'median',11,'NaN');
+
 % low pass filter (filtfilt) T/C with running 3 pt triangular window
 profile = filterRBR(profile,{'Temperature','Conductivity'},3);
 
@@ -61,9 +65,9 @@ profile.PracticalSalinity = gsw_SP_from_C(profile.Conductivity,....
 % interactive function to choose start and end points of profile
 profile = trimRBR(profile);
 
-% despike the fluorometer and turbidity profiles.  Use an 11 point
-% median filter to find the spikes, and replace them with NaN
-profile = despikeRBR(profile,{'Chlorophyll','Turbidity'},'median',11,'NaN');
+% Identify scans when the descent rate and deceleration were such that
+% hydrodynamic wake may have contaminated the data, and flag with NaN.
+profile = loopRBR(profiles,'NaN');
 
 %% bin average all variables by pressure into 1 dbar bins
 profile = binRBR(profile,'pressure',1);
@@ -74,6 +78,6 @@ profile = binRBR(profile,'pressure',1);
 
 1. Modify `despikeRBR.m` to operate on blocks of data instead of full profile.
 2. Remove the atmospheric pressure correction from `rbrExtractVals.m`
-   and place elsewhere?
+   and place elsewhere (new function?).
 3. Improve the profile detection in `rbrExtractVals.m`.
 4. Add up/down cast detection to `trimRBR.m`.
