@@ -27,7 +27,10 @@ function out = loopRBR(in,replaceWith)
 %
 %  The deceleration falls below -0.1 m/s^2 AND ...
 %  the drop speed falls below 0.4 m/s.
-
+%
+% Finally, note that these values are derived for the downcast.
+% Applying loopRBR to the upcast will produce strange results, however
+% the upcast is not generally useful for scientific purposes.
 
 minDescentRate = 0.4; % m/s
 minDecelRate = -0.1;  % m/s^2
@@ -59,19 +62,22 @@ if ~isfield(in,'DescentRate'),
      
 end
 
-% now calculate acceleration
+% Check if accelration rate exists. Calculate if not
+if ~isfield(in,'DecelRate'),
+ 
+    out.DecelRate = diff(out.DescentRate)./out.samplingPeriod; % m/s^2
+    mtime = out.mtime(1:end-1) + diff(out.mtime)/2;
+    out.DecelRate = interp1(mtime,out.DecelRate,out.mtime,...
+                            'linear','extrap');
+    out.units(end+1) = {'m/s^2'};
 
-out.DecelRate = diff(out.DescentRate)./out.samplingPeriod; % m/s^2
-mtime = out.mtime(1:end-1) + diff(out.mtime)/2;
-out.DecelRate = interp1(mtime,out.DecelRate,out.mtime,...
-                        'linear','extrap');
-out.units(end+1) = {'m/s^2'};
-
-
+end
 
 %% flag data which do not meet the minimum velocity and acceleration criteria
 kk = out.DescentRate <= minDescentRate & ...
      out.DecelRate   <= minDecelRate;
+
+kk = kk | out.DescentRate < 0; % also toss extreme cases when CTD loops
 
 
 %% apply the flag to the sensor data
