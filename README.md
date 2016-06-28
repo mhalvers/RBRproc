@@ -9,10 +9,14 @@ At the moment the toolbox is designed to use RBR's RSKtools Matlab
 toolbox to read raw 'rsk' sqlite files.  The output structure from
 RSKtools is then converted into a more convenient multidimensional
 structure.  This structure is then used as input to the various
-RBRproc processing routines.  For RBR loggers which output hexadecimal
-files, one could also read any one of the Ruskin outputs (mat, txt,
-Excel, etc) into Matlab and create a structure resembling the output
-of rbrExtractVals.m.
+RBRproc processing routines.
+
+For RBR loggers which output hexadecimal files, one could also read
+any one of the Ruskin outputs (mat, txt, Excel, etc) into Matlab.
+Following this, insert the data into the blank structure created by
+the function `blankRBRstruct.m`.  Matlab functions to read RBR hex or
+txt files do not exist as far as I know (volunteers?), but reading
+Excel files and mat files in Matlab is trivial.
 
 
 ## Requirements
