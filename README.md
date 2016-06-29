@@ -89,6 +89,6 @@ profile = binRBR(profile,'pressure',1);
 
 1. Modify `despikeRBR.m` to operate on blocks of data instead of full
    profile.
-2. Improve the cast detection in `rbrExtractVals.m`.  Provide indices
-   to select up and down cast
+2. Improve the cast detection in `rbrExtractVals.m`.  Provide vector
+   of indices to separate up and down casts.
 
