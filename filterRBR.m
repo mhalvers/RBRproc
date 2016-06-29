@@ -6,19 +6,30 @@ function [out] = filterRBR(in,vars,np)
 %
 %   where:
 %      in          : structure of rbr data (ie output from rbrExtractVals.m)
-%      vars        : cell array of variables to filter.
-%      np          : filter parameter
+%      vars        : cell array of variables to filter
+%      np          : filter length in points
 %
 %     If 'np' is a scalar, specifies the length (in points) of a
 %     triangular window.  If 'np' is a vector, then it is taken to be
 %     the window function to be applied to the data - eg
 %     hamming(21)/sum(hamming(21)).
 %
-%     note - filterRBR uses filtfilt to produce a zero-phase response.
-%     One might choose to call filter with a IIR-type filter to match
-%     sensor time constants.  However, the lag produced by a sensor's
+%     filterRBR uses the Matlab Signal Processing Toolbox function
+%     'filtfilt'
+%
+%     Note - filtfilt produces a zero-phase response.  One might
+%     choose to call filter with a IIR-type filter to match sensor
+%     time constants.  However, the lag produced by a sensor's
 %     time-dependent response can be accounted for by simply shifting
-%     the sensor in time (eg with alignRBR.m)
+%     the sensor in time (eg, with 'alignRBR')
+
+
+% check if Signal Processing toolbox exists
+v = ver;
+
+if ~any(strcmp('Signal Processing Toolbox', {v.Name})),
+    error('filterRBR requires Signal Process Toolbox function ''filtfilt''')
+end
 
 
 %% set up filter
