@@ -23,9 +23,13 @@ Excel files and mat files in Matlab is trivial.
 
 ### RSKtools
 
+Official releases can be found at:
+
 [RBR Global link](http://www.rbr-global.com/support/matlab-tools)
 
-[Github page](https://github.com/RBRglobal/RSKtools)
+Bleeding edge development versions at:
+
+[Bitbucket](https://bitbucket.org/rbr/rsktools)
 
 
 ### Gibbs SeaWater Matlab tool box
