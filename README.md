@@ -41,11 +41,8 @@ Bleeding edge development versions at:
 % read logger data into Matlab using RSKtools
 rsk = RSKopen(rskfile);
 rsk = RSKreaddata(rsk);
-```
 
-
-```matlab
-% puts things in a friendly 1 x Ncast structure. casts are determined
+% recast things into a friendly 1 x Ncast structure. casts are determined
 % by finding large gaps in the time stamps
 profiles = rbrExtractVals(rsk); 
 
@@ -67,7 +64,7 @@ profile = filterRBR(profile,{'Temperature','Conductivity'},3);
 profile = alignRBR(profile,'Conductivity',-2/6);
 
 % Identify scans when the descent rate and deceleration were such that
-% hydrodynamic wake may have contaminated the data, and flag with NaN.
+% hydrodynamic wake may have contaminated the data, and replace with `NaN`.
 profile = loopRBR(profiles,'NaN');
 
 % now calculate practical salinity
@@ -88,7 +85,11 @@ profile = binRBR(profile,'pressure',1);
 ## Laundry list
 
 1. Modify `despikeRBR.m` to operate on blocks of data instead of full
-   profile.
-2. Improve the cast detection in `rbrExtractVals.m`.  Provide vector
-   of indices to separate up and down casts.
+profile.
+
+2. Improve the cast detection in `rbrExtractVals.m`.
+
+3. Have `trimRBR.m` determine indices to extract the upcast and
+downcast from an individual profile.  Use the 'profiles' field field,
+if it exists, to determine the upcast and downcast.
 

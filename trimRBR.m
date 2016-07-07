@@ -13,7 +13,7 @@ function [out,ind] = trimRBR(in,ind),
 %      window prompting the user to select the cast limits by hand.
 %      The indices selected with the gui are then provided as an
 %      output.
-%
+
 
 out = in;
 
