@@ -1,37 +1,37 @@
-function casts = rbrExtractVals(profile,upDownOrBoth);
+function casts = rbrExtractVals(profile);
 
 % Takes the output structure from RSKreaddata(rskfile) and converts it
 % into a useful structure.
 %
 % Converts it into a ncast x 1 structure with easily accessible data.
 %
-% Uses time record to find large gaps to delineate individual
-% profiles.  This is rather crude and it will most certainly fail
-% under some circumstances.  Use trimRBR to select downcasts and
-% upcasts.
+% File is parsed into casts by finding large gaps in the time record.
+% This is rather crude and it will most certainly fail under some
+% circumstances.  Use trimRBR to select downcasts and upcasts.
+%
+% In the future it would be useful if rbrExtractVals could identify
+% the upcasts and downcasts, and provide indices to extract them.
 
 
-% upDownOrBoth = 'both'; % only one that works now
-% % upDownOrBoth = 'up';
-% % upDownOrBoth = 'down';
+% for testing
+% profile = rsk;
+% clear rsk casts
 
-if nargin==1,
-  upDownOrBoth = 'both';
-end
 
 %% create a temporary structure with relavant info in a simpler format
 
 rbr.fileName = profile.deployments.name;
 rbr.samplingPeriod = profile.schedules.samplingPeriod/1000; % seconds
 rbr.mtime = profile.data.tstamp;
-rbr.units = profile.data.units;
+rbr.channels = {profile.channels.longName};
+rbr.units = {profile.channels.units};
 rbr.serialID = num2str(profile.instruments.serialID);
 rbr.model = profile.instruments.model;
 if isfield(profile,'profiles'),
   rbr.profiles = profile.profiles;
 end
 
-vars = profile.data.longName;
+vars = rbr.channels;
 
 for k=1:length(vars),
     
@@ -39,83 +39,79 @@ for k=1:length(vars),
     
     ind = ~cellfun('isempty',strfind(vars,lbl));
     
+    % replace spaces with underscores
+    lbl = strrep(lbl,' ','_');
+    
     % replace empty and nonprintable characters in 'Dissolved O‚€'
     if strcmp(lbl(1:3),'Dis'),
-        lbl(lbl==32 | lbl>=128) = ''; %ascii values
+        lbl(lbl>=128) = ''; %ascii values
         lbl(end+1) = '2';
-        vars(k) = {lbl};
     end
     
     rbr.(lbl) = profile.data.values(:,ind);
-
+    
+    vars(k) = {lbl};
 end
 
 
+%% get the start and end times of each profile
+% use trimRBR.m to separate the upcasts and downcasts
 
-switch (lower(upDownOrBoth(1:2)))
-  case 'bo'
-    strt = 'downcast';
-    endt = 'upcast';
-  case 'up'
-    strt = 'upcast';
-    endt = 'upcast';
-  case 'do'
-    strt = 'downcast';
-    endt = 'downcast';
-end
+% for testing
+% plot(rbr.mtime,rbr.Pressure,'o','markersize',4)
+% zoom on;grid on;fillMarkers;
+% zoomAdaptiveDateTicks('on');
+% fsize(15);
 
-if isfield(rbr,'profiles'),
-    
-    tstart =  rbr.profiles.(strt).tstart;
-    tend   =  rbr.profiles.(endt).tend;
-    
-else
+dt = 3; % time gap in minutes
 
-    ind = find(diff(rbr.mtime)>10/60/24);
-    ind = [1; ind+1];
-    tstart = rbr.mtime(ind);
-    ind = find(diff(rbr.mtime)>10/60/24);
-    ind = [ind; length(rbr.mtime)];
-    tend = rbr.mtime(ind);
+ind = find(diff(rbr.mtime)>dt/60/24);
+ind = [1; ind+1];
+tstart = rbr.mtime(ind);
+
+ind = find(diff(rbr.mtime)>dt/60/24);
+ind = [ind; length(rbr.mtime)];
+tend = rbr.mtime(ind);
     
-end
 
 
 
 %% transform into multidimensional structure, ncast x 1
 
-% t_end works, but not t_start, so only use t_end
-for k = 1:length(tend),
+for k = 1:length(tstart),
     
-    if k==1,
-        kk = rbr.mtime<tend(k);
-    elseif k>1,
-        kk = rbr.mtime>tend(k-1) & rbr.mtime<tend(k);
-    end
+    kk = rbr.mtime>=tstart(k) & rbr.mtime<=tend(k);
     
     casts(k).fileName = rbr.fileName;
+    casts(k).channels = rbr.channels;
     casts(k).units = rbr.units;
     casts(k).serialID = rbr.serialID;
     casts(k).model = rbr.model;
     casts(k).tzone = '?';
     casts(k).samplingPeriod = rbr.samplingPeriod;
-    casts(k).mtime = rbr.mtime(kk);
     
     if isfield(rbr,'profiles'),
-        casts(k).profiles.downcast.tstart = rbr.profiles.downcast.tstart(k);
-        casts(k).profiles.downcast.tend = rbr.profiles.downcast.tend(k);
-        casts(k).profiles.upcast.tstart = rbr.profiles.upcast.tstart(k);
-        casts(k).profiles.upcast.tend = rbr.profiles.upcast.tend(k);
+        try % b/c RBR and I sometimes disagree on the # of profiles
+            casts(k).profiles.downcast.tstart = rbr.profiles.downcast.tstart(k);
+            casts(k).profiles.downcast.tend = rbr.profiles.downcast.tend(k);
+            casts(k).profiles.upcast.tstart = rbr.profiles.upcast.tstart(k);
+            casts(k).profiles.upcast.tend = rbr.profiles.upcast.tend(k);
+        catch
+            casts(k).profiles.downcast.tstart = [];
+            casts(k).profiles.downcast.tend = [];
+            casts(k).profiles.upcast.tstart = [];
+            casts(k).profiles.upcast.tend = [];
+        end
     end
     
+    casts(k).mtime = rbr.mtime(kk);
+
     for j = 1:length(vars),
       casts(k).(vars{j}) = rbr.(vars{j})(kk);    
     end
     
     casts(k).processingLog = {[rbr.fileName ' converted into RBRproc ' ...
-                    'structure']};
+                    'structure.  Parsed file into casts.']};
 
 
 end
-
-
