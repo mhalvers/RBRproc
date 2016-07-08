@@ -9,8 +9,11 @@ function casts = rbrExtractVals(profile);
 % This is rather crude and it will most certainly fail under some
 % circumstances.  Use trimRBR to select downcasts and upcasts.
 %
-% In the future it would be useful if rbrExtractVals could identify
-% the upcasts and downcasts, and provide indices to extract them.
+% Note that using the '.profiles' for finding the up and downcasts
+% will remove the soak period, which can be useful for some purposes.
+%
+% In the future rbrExtractVals might be altered to identify the
+% upcasts and downcasts, and provide indices to extract them.
 
 
 % for testing
@@ -51,6 +54,7 @@ for k=1:length(vars),
     rbr.(lbl) = profile.data.values(:,ind);
     
     vars(k) = {lbl};
+    rbr.channels(k) = {lbl};
 end
 
 
@@ -115,3 +119,10 @@ for k = 1:length(tstart),
 
 
 end
+
+%% print out some useful information
+
+disp(['Found ' num2str(k) ' casts with start times:'])
+disp(datestr(arrayfun(@(x) min(x.mtime),casts)))
+
+
