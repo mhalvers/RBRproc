@@ -17,9 +17,14 @@ function out = correctHoldRBR(in,replaceWith)
 % some instruments the A2D converter must recalibrated peridically.
 % In the time it takes for this to occur, a sample is missed.  RBR
 % fills this missed scan with the same data as the previous scan,
-% which is called a first-order hold.  The zero-hol dpoints are found
-% by looking for where consecutive pressure differences are equal to
-% zero.
+% which is called a first-order hold.  This function identifies
+% zero-hold points by looking for where consecutive pressure
+% differences are equal to zero.
+%
+% Some care should be taken to determine whether this function should
+% be applied, because in some instruments the hold seems to last for
+% more than one scan.  The function currently does not address these
+% cases.
 %
 %  Mark Halverson, July 2016
     
@@ -37,9 +42,17 @@ out = in;
 % the zero-order hold points to be replaced
 ind = find(diff(in.Pressure)==0) + 1;
 
-% are they the same as conductivity?
-% cind = find(diff(in.Conductivity)==0);
-% all(ind == cind)
+% % are they the same as conductivity?
+% cind = find(diff(in.Conductivity)==0) + 1;
+% % all(ind == cind)
+% 
+% % are they the same as temperature?
+% tind = find(diff(in.Temperature)==0) + 1;
+% % all(ind == tind)
+% 
+% ismember(ind,cind) % are all dP==0 in dC==0?
+% ismember(ind,tind) % are all dP==0 in dT==0?
+
 
 if length(ind)>0,
 
