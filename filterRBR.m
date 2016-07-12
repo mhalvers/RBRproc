@@ -82,8 +82,11 @@ else
 end
 
 
+%% append processing log
 
-out.processingLog = {[char(vars) ' filtered with '...
-                     num2str(np) ' point ' wdw ' window']};
+nlog = length(in.processingLog);
+
+out.processingLog(nlog+1) = {[char(vars) ' filtered with '...
+                              num2str(np) ' point ' wdw ' window']};
 
 
