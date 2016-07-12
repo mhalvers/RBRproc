@@ -23,11 +23,11 @@ Excel files and mat files in Matlab is trivial.
 
 ### RSKtools
 
-Official releases can be found at:
+Official releases:
 
 [RBR Global link](http://www.rbr-global.com/support/matlab-tools)
 
-Bleeding edge development versions at:
+Bleeding edge development version:
 
 [Bitbucket](https://bitbucket.org/rbr/rsktools)
 
@@ -45,6 +45,13 @@ rsk = RSKreaddata(rsk);
 % recast things into a friendly 1 x Ncast structure. casts are determined
 % by finding large gaps in the time stamps
 profiles = rbrExtractVals(rsk); 
+
+% plot a time series of pressure to see the profiles
+plot(cat(1,profiles.mtime),cat(1,profiles.Pressure)-10.1325,'.-')
+title(profiles(1).fileName,'interpreter','none')
+
+% find the maximum pressure of each profile
+arrayfun(@(x) max(x.Pressure),profiles)
 
 % extract the 4th profile for this example
 profile = profiles(4);
