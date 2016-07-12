@@ -91,12 +91,15 @@ profile = binRBR(profile,'pressure',1);
 
 ## Laundry list
 
-1. Modify `despikeRBR.m` to operate on blocks of data instead of full
-profile.
+1. Implement better input handling.
 
 2. Improve the cast detection in `rbrExtractVals.m`.
 
-3. Have `trimRBR.m` determine indices to extract the upcast and
-downcast from an individual profile.  Use the 'profiles' field field,
-if it exists, to determine the upcast and downcast.
+3. Decide on where to implement upcast and downcast delineation.
+Possibilities include `trimRBR.m`, `rbrExtractVals.m`, or perhaps a
+new function.  Use the 'profiles' field, if it exists, to determine
+the upcast and downcast.
+
+4. Modify `despikeRBR.m` to operate on blocks of data instead of full
+profile.
 
