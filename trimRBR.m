@@ -1,51 +1,43 @@
-function [out,ind] = trimRBR(in,ind),
+function [out,ind] = trimRBR(in,ind);
 
 % trimRBR discards scans from an RBR profile.  
 %
 %  usage: out = trimRBR(in,ind);
 %
 %   where:
-%      in          : structure of rbr data (ie output from 
-%                  : rbrExtractVals.m)
-%      ind         : If known, optional vector of indices to retain.  
+%      in          : Structure of RBR profiler data (i.e., 
+%                    output from rbrExtractVals.m).
+%      ind         : Optional vector of indices to retain.  
 %
-%      If ind is not specified, trimRBR launches a (crude) interactive
-%      window prompting the user to select the cast limits by hand.
-%      The indices selected with the gui are then provided as an
-%      output.
+%      If 'ind' is not specified, trimRBR launches a (crude)
+%      interactive plot of pressure vs time so that the user can
+%      select the cast limits by hand.  The resulting indices are
+%      provided as an optional output.
 
 
 out = in;
 
 if nargin==1,
     
-    for k = length(in),
+    figure
+    plot(in.Pressure,'ko-')    
+    grid on;
   
-        if k==1;fh = figure;end
-        if k>1;figure(fh);end
-        clf
+    disp('Press any key after zooming to choose profile start')
+    zoom on;
+    pause
+    disp('Choose start point')
+    [xs,~] = ginput(1);
+    clf
   
-        plot(in.Pressure,'ko-')    
-        grid on;
-  
-        disp('Press any key after zooming to choose profile start')
-        zoom on;
-        pause
-        disp('Choose start point')
-        [xs(k),~] = ginput(1);
-        clf
-  
-        plot(in.Pressure,'ko-')    
-        grid on;
-        zoom on
-        disp('Press any key after zooming to choose profile end')
-        pause
-        disp('Choose end point')
-        [xe(k),~] = ginput(1);
+    plot(in.Pressure,'ko-')    
+    grid on;
+    zoom on
+    disp('Press any key after zooming to choose profile end')
+    pause
+    disp('Choose end point')
+    [xe,~] = ginput(1);
         
-        if k==length(in);close(fh);end
-    end
-
 elseif nargin==2,
 
     xs = ind(1);
@@ -55,23 +47,22 @@ end
 
 
 
-for k = 1:length(in)
-    ind = ceil(xs(k)):floor(xe(k));
+ind = [floor(xs):ceil(xe)];
 
-    vars = fieldnames(in(k));
-    %cls = structfun(@isnumeric,in,'uniformoutput',false);
+vars = fieldnames(in);
 
-    for j = 1:length(vars)
-        if isnumeric(in.(vars{j})) & numel(in.(vars{j}))>1,
-            out.(vars{j}) = in.(vars{j})(ind);
-        end
+for j = 1:length(vars)
+    if isnumeric(in.(vars{j})) & numel(in.(vars{j}))>1,
+        out.(vars{j}) = in.(vars{j})(ind);
     end
-
-    nlog = length(out(k).processingLog);
-    out(k).processingLog(nlog+1) = {['Profile trimmed']};
-
 end
 
 
+
+%% append processing log
+
+nlog = length(out.processingLog);
+
+out.processingLog(nlog+1) = {['Profile trimmed']};
 
 
