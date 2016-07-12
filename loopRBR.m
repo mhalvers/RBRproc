@@ -38,13 +38,13 @@ minDecelRate = -0.1;  % m/s^2
 out = in;
 
 % Check if Depth exists.  Calculate if not.
-if isempty(in.Depth),
+if ~isfield(in,'Depth'),
   out.Depth = -gsw_z_from_p(out.Pressure,out.Latitude);
   out.units(end+1) = {'m'};
 end
 
 % Check if Descent Rate exists.  Calculate if not.
-if isempty(in.DescentRate),
+if ~isfield(in,'DescentRate'),
     
     np = 3; % Jen's recommendation
     fltr = boxcar(np)/sum(boxcar(np));fltr = fltr(:);
@@ -62,7 +62,7 @@ if isempty(in.DescentRate),
 end
 
 % Check if acceleration rate exists. Calculate if not
-if isempty(in.DecelRate),
+if ~isfield(in,'DecelRate'),
  
     out.DecelRate = diff(out.DescentRate)./out.samplingPeriod; % m/s^2
     mtime = out.mtime(1:end-1) + diff(out.mtime)/2;
@@ -82,9 +82,7 @@ kk = kk | out.DescentRate < 0; % also toss extreme cases when CTD loops
 %% apply the flag to the sensor data
 
 % list of sensors to flag
- 
-vars = {'Conductivity' 'Temperature' 'PAR' 'Turbidity' 'Chlorophyll' ...
-        'DissolvedO2' 'Salinity'};
+vars = out.channels;
 
 
 for j = 1:length(vars),
