@@ -5,8 +5,8 @@ function out = binRBR(in,by,binWidth)
 %  out = binRBR(in,by,binWidth);
 %
 %   where 
-%     in        : structure of rbr data created by output from
-%                 rbrExtractVals.m
+%     in        : structure of RBR profiler data (i.e., created 
+%                 by output from rbrExtractVals.m)
 %     by        : is a string specifying how to bin the  data 
 %                 ('depth' or 'pressure')
 %     binWidth  : is the bin width
@@ -45,8 +45,6 @@ switch by
   case 'pressure'
     binCenter = [binWidth:binWidth:ceil(max(in.Pressure))]';
     out.Pressure = binCenter;
-    out.Depth = -gsw_z_from_p(out.Pressure,52);
-    unit = 'dbar'; % for processing log text  
   case 'depth'
     in.Depth = -gsw_z_from_p(in.Pressure,52);
     binCenter = [binWidth:binWidth:ceil(max(in.Depth))]';
