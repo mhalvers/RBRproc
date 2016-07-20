@@ -7,16 +7,15 @@ function out = rmPatmRBR(in,patm)
 %     in        : structure of rbr data created by output from
 %                 rbrExtractVals.m
 %
-%     patm      : Optional input argument specifying atmosperhic 
-%                 pressureof pressure value.  Use 10.1325 dbar 
-%                 to specify the nominal atmospheric sea level
-%                 pressure.  If not supplied, then rmPatmRBR
-%                 estimates atmospheric pressure as the median of all
-%                 pressure measurements occuring when conductivity is
-%                 less than 1 mS/cm.  Note that using the near-zero 
-%                 conductivity to find in-air pressure will likely 
-%                 fail in fresh water.  But most lakes are not at sea 
-%                 level, so you can either specify your own atmoshperic
+%     patm      : Optional input argument specifying atmospheric 
+%                 pressure.  Use 10.1325 dbar to specify the nominal 
+%                 atmospheric sea level pressure.  If not supplied, 
+%                 then rmPatmRBR estimates atmospheric pressure as 
+%                 the median of all pressure measurements occuring 
+%                 when conductivity is less than 1 mS/cm.  Note that 
+%                 using the near-zero conductivity to find in-air 
+%                 pressure will likely fail in fresh water.  In this
+%                 case you can either specify your own atmoshperic
 %                 pressure or reduce the conductivity threshold.
 %
 %  Mark Halverson, July 2016
