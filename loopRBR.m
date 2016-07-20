@@ -43,34 +43,29 @@ if ~isfield(in,'Depth'),
   out.units(end+1) = {'m'};
 end
 
-% Check if Descent Rate exists.  Calculate if not.
-if ~isfield(in,'DescentRate'),
+%% Calculate descent rate
     
-    np = 3; % Jen's recommendation
-    fltr = boxcar(np)/sum(boxcar(np));fltr = fltr(:);
-    fdpth = filtfilt(fltr,1,out.Depth);
-    
-    out.DescentRate = diff(fdpth)./out.samplingPeriod; % m/s
-    
-    % put the descent rate on the original time stamp
-    mtime = out.mtime(1:end-1) + diff(out.mtime)/2;
-    out.DescentRate = interp1(mtime,out.DescentRate,out.mtime,...
-                              'linear','extrap');
+% first smooth the Depth time series
+np = 3; 
+fltr = boxcar(np)/sum(boxcar(np));fltr = fltr(:);
+fdpth = filtfilt(fltr,1,out.Depth);
 
-    out.units(end+1) = {'m/s'};
+out.DescentRate = diff(fdpth)./out.samplingPeriod; % m/s
+    
+% put the descent rate on the original time stamp
+mtime = out.mtime(1:end-1) + diff(out.mtime)/2;
+out.DescentRate = interp1(mtime,out.DescentRate,out.mtime,...
+                          'linear','extrap');
+out.units(end+1) = {'m/s'};
      
-end
 
-% Check if acceleration rate exists. Calculate if not
-if ~isfield(in,'DecelRate'),
- 
-    out.DecelRate = diff(out.DescentRate)./out.samplingPeriod; % m/s^2
-    mtime = out.mtime(1:end-1) + diff(out.mtime)/2;
-    out.DecelRate = interp1(mtime,out.DecelRate,out.mtime,...
-                            'linear','extrap');
-    out.units(end+1) = {'m/s^2'};
+%% Calculate acceleration
+out.DecelRate = diff(out.DescentRate)./out.samplingPeriod; % m/s^2
+mtime = out.mtime(1:end-1) + diff(out.mtime)/2;
+out.DecelRate = interp1(mtime,out.DecelRate,out.mtime,...
+                        'linear','extrap');
+out.units(end+1) = {'m/s^2'};
 
-end
 
 %% flag data which do not meet the minimum velocity and acceleration criteria
 kk = out.DescentRate <= minDescentRate & ...
@@ -81,8 +76,24 @@ kk = kk | out.DescentRate < 0; % also toss extreme cases when CTD loops
 
 %% apply the flag to the sensor data
 
-% list of sensors to flag
-vars = out.channels;
+% first develop a list of sensors
+% vars = out.channls;
+
+
+
+% get all fieldnames
+vars = fieldnames(in);
+
+% find the ones that are from sensors (or derived quantities)
+jj = structfun(@(x) numel(x),in)==length(in.mtime);
+vars = vars(jj);
+
+% we don't want to flag pressure, depth, or time
+vars = vars(~strcmp(vars,{'mtime'}));
+vars = vars(~strcmp(vars,{'Pressure'}));
+vars = vars(~strcmp(vars,{'Depth'}));
+vars = vars(~strcmp(vars,{'DescentRate'}));
+vars = vars(~strcmp(vars,{'DecelRate'}));
 
 
 for j = 1:length(vars),
