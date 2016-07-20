@@ -17,7 +17,7 @@ function out = rmPatmRBR(in,patm)
 %                 conductivity to find in-air pressure will likely 
 %                 fail in fresh water.  But most lakes are not at sea 
 %                 level, so you can either specify your own atmoshperic
-%                 pressure anyway or reduce the conductivity threshold.
+%                 pressure or reduce the conductivity threshold.
 %
 %  Mark Halverson, July 2016
     
@@ -29,10 +29,10 @@ out = in;
 if nargin==1,
 
     % find all the in-air values, defined as scans when C<1 mS/cm.
-    kk = profiles(k).Conductivity<1;
+    kk = in.Conductivity<1;
 
-    % atmospheric pressure is median of all the in-air pressure recordings
-    patm = nanmedian(profiles.Pressure(kk));
+    % atmospheric pressure is median of all the in-air pressure values
+    patm = nanmedian(in.Pressure(kk));
 
 end
 
