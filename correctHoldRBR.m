@@ -12,14 +12,14 @@ function out = correctHoldRBR(in,replaceWith)
 %                :     'interp'   - linear interpolation over flagged values
 %                :     'NaN'      - replace flagged values with NaN
 %
-% correctHoldRBR interpolates over or replaces what are effectively
-% erroneous values created by what is called a "zero-order hold". In
-% some instruments the A2D converter must recalibrated peridically.
-% In the time it takes for this to occur, a sample is missed.  RBR
-% fills this missed scan with the same data as the previous scan,
-% which is called a first-order hold.  This function identifies
-% zero-hold points by looking for where consecutive pressure
-% differences are equal to zero.
+% correctHoldRBR removes or replaces what are effectively erroneous
+% values created by what is called a "zero-order hold". In some
+% instruments the A2D converter must recalibrated peridically.  In the
+% time it takes for this to occur, a sample is missed.  RBR fills this
+% missed scan with the same data as the previous scan, which is called
+% a first-order hold.  This function identifies zero-hold points by
+% looking for where consecutive pressure differences are equal to
+% zero.
 %
 % Some care should be taken to determine whether this function should
 % be applied, because in some instruments the hold seems to last for
@@ -44,11 +44,9 @@ ind = find(diff(in.Pressure)==0) + 1;
 
 % % are they the same as conductivity?
 % cind = find(diff(in.Conductivity)==0) + 1;
-% % all(ind == cind)
 % 
 % % are they the same as temperature?
 % tind = find(diff(in.Temperature)==0) + 1;
-% % all(ind == tind)
 % 
 % ismember(ind,cind) % are all dP==0 in dC==0?
 % ismember(ind,tind) % are all dP==0 in dT==0?
