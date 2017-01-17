@@ -44,7 +44,7 @@ out = in;
 switch by
   case 'pressure'
     binCenter = [binWidth:binWidth:ceil(max(in.Pressure))]';
-    out.Pressure = double(binCenter);
+    out.Pressure = binCenter;
   case 'depth'
     in.Depth = -gsw_z_from_p(in.Pressure,52);
     binCenter = [binWidth:binWidth:ceil(max(in.Depth))]';
