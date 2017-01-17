@@ -4,10 +4,10 @@ function out = binRBR(in,by,binWidth)
 %
 %  out = binRBR(in,by,binWidth);
 %
-%   where 
-%     in        : structure of RBR profiler data (i.e., created 
+%   where
+%     in        : structure of RBR profiler data (i.e., created
 %                 by output from rbrExtractVals.m)
-%     by        : is a string specifying how to bin the  data 
+%     by        : is a string specifying how to bin the  data
 %                 ('depth' or 'pressure')
 %     binWidth  : is the bin width
 %
@@ -15,13 +15,13 @@ function out = binRBR(in,by,binWidth)
 %         depth is calculated from pressure and latitude using the GSW
 %         function gsw_z_from_p
 
- 
+
 %% for testing
-% in = profile; 
+% in = profile;
 % % by = 'depth';
 % by = 'pressure';
 % binWidth = 1;
-  
+
 
 %% develop a list of sensors to bin
 vars = fieldnames(in);
@@ -56,7 +56,7 @@ out.units(end+1) = {'m'};
 
 
 
-%  initialize the binned output fields    
+%  initialize the binned output fields
 for k=1:length(vars),
   out.(vars{k}) = NaN(length(binCenter),1);
 end
@@ -72,10 +72,10 @@ for k=1:length(binCenter),
       kk = in.Depth>=binCenter(k)-binWidth/2 & ...
            in.Depth< binCenter(k)+binWidth/2;
   end
-  
+
   if any(kk),
      for j=1:length(vars),
-       out.(vars{j})(k) = nanmean(in.(vars{j})(kk));         
+       out.(vars{j})(k) = nanmean(in.(vars{j})(kk));
      end
   end
 
