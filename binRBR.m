@@ -44,11 +44,11 @@ out = in;
 switch by
   case 'pressure'
     binCenter = [binWidth:binWidth:ceil(max(in.Pressure))]';
-    out.Pressure = binCenter;
+    out.Pressure = double(binCenter);
   case 'depth'
     in.Depth = -gsw_z_from_p(in.Pressure,52);
     binCenter = [binWidth:binWidth:ceil(max(in.Depth))]';
-    out.Depth = binCenter;
+    out.Depth = double(binCenter);
     out.Pressure = gsw_p_from_z(-out.Depth,52);
     unit = 'm'; % for processing log text
 end
