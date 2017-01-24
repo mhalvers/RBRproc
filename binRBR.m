@@ -37,6 +37,8 @@ vars = vars(ind);
 vars = vars(~strcmp(vars,{'Pressure'}));
 vars = vars(~strcmp(vars,{'Depth'}));
 
+% cast binWidth to double incase it is passed in as an integer
+binWidth = double(binWidth)
 
 
 out = in;
