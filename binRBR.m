@@ -51,7 +51,7 @@ switch by
   case 'depth'
     in.Depth = -gsw_z_from_p(in.Pressure,52);
     binCenter = [binWidth:binWidth:ceil(max(in.Depth))]';
-    out.Depth = double(binCenter);
+    out.Depth = binCenter;
     out.Pressure = gsw_p_from_z(-out.Depth,52);
     unit = 'm'; % for processing log text
 end
