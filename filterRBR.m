@@ -84,7 +84,11 @@ end
 
 %% append processing log
 
-nlog = length(in.processingLog);
+if isfield(in,'processingLog');
+  nlog = length(in.processingLog);
+else
+  nlog = 0;
+end
 
 out.processingLog(nlog+1) = {[char(vars) ' filtered with '...
                               num2str(np) ' point ' wdw ' window']};

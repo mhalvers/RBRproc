@@ -1,4 +1,4 @@
-function out = alignRBR(in,vars,tau)
+function out = alignRBR(in,vars,tShift)
 
 % Advance or lag sensor in time by a user-defined number of seconds.
 % A positive value advances the variable in time, whereas a negative
@@ -10,14 +10,14 @@ function out = alignRBR(in,vars,tau)
 %
 % Usage:
 %
-%  out = alignRBR(in,vars,tau)
+%  out = alignRBR(in,vars,tShift)
 %
 %   where:
 %     in         : structure of rbr data created by output from 
 %                  rbrExtractVals.m
 %     vars       : cell array of strings describing which variables 
 %                  to filter
-%     tau        : time shift in seconds
+%     tShift     : time shift in seconds
 %
 % Most common use is to shift temperature and/or conductivity relative
 % to pressure.  The pressure and temperature are (physically) close
@@ -31,7 +31,14 @@ function out = alignRBR(in,vars,tau)
 
 
 % translate from time to scans
-nscan = round(tau./in.samplingPeriod);
+
+if strcmp(class(in.samplingPeriod),'duration')
+  dt = seconds(in.samplingPeriod);
+else
+  dt = in.samplingPeriod;
+end
+
+nscan = round(tShift./dt);
 
 
 
@@ -57,10 +64,20 @@ for k=1:length(vars),
 end
 
 
+
+%% append processing log
+
+
+if isfield(in,'processingLog');
+  nlog = length(in.processingLog);
+else
+  nlog = 0;
+end
+
+% cat the variables aligned for the log string
 if numel(vars)>1,
     vars = strjoin(vars,', ');
 end
 
-nlog = length(out.processingLog);
-out.processingLog(nlog+1) = {[char(vars) ' shifted by ' num2str(round(100*tau)/100) ' seconds']};
+out.processingLog(nlog+1) = {[char(vars) ' shifted by ' num2str(round(100*tShift)/100) ' seconds']};
 
