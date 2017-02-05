@@ -50,9 +50,8 @@ end
 ind = [floor(xs):ceil(xe)];
 
 vars = fieldnames(in);
-
 for j = 1:length(vars)
-    if isnumeric(in.(vars{j})) & numel(in.(vars{j}))>1,
+    if isnumeric(in.(vars{j})) & numel(in.(vars{j}))>1 | isa(in.(vars{j}),'datetime'),
         out.(vars{j}) = in.(vars{j})(ind);
     end
 end
