@@ -61,7 +61,12 @@ end
 
 %% append processing log
 
-nlog = length(out.processingLog);
+if isfield(in,'processingLog');
+  nlog = length(in.processingLog);
+else
+  nlog = 0;
+end
+
 
 out.processingLog(nlog+1) = {['Profile trimmed']};
 
