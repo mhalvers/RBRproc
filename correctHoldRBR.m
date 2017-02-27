@@ -42,6 +42,10 @@ out = in;
 % the zero-order hold points to be replaced
 ind = find(diff(in.Pressure)==0) + 1;
 
+if length(ind)>0,hasHold = 1;end
+
+
+
 % % are they the same as conductivity?
 % cind = find(diff(in.Conductivity)==0) + 1;
 % 
@@ -52,15 +56,15 @@ ind = find(diff(in.Pressure)==0) + 1;
 % ismember(ind,tind) % are all dP==0 in dT==0?
 
 
-if length(ind)>0,
+if hasHold,
 
     % loop through channels
-
-    channels = in.channels;
-
-    for k=1:length(channels),
-  
-        tvar = in.(channels{k});  
+    vars = fieldnames(in);
+    
+    for k=1:length(vars),
+        
+      if isnumeric(in.(vars{k})) & numel(in.(vars{k}))>1 | isa(in.(vars{k}),'datetime')
+        tvar = in.(vars{k});  
 
         switch replaceWith
       
@@ -76,22 +80,32 @@ if length(ind)>0,
         
         end
   
-        out.(channels{k}) = tvar;
-  
-    end
+        out.(vars{k}) = tvar;
+        
+      end % check if 'var' is a data channel
+      
+    end %looping over data channels
+
+end %hasHold
 
 
-    %% append the processing log
 
-    nlog = length(in.processingLog);
+%% append the processing log
 
+if isfield(in,'processingLog');
+  nlog = length(in.processingLog);
+else
+  nlog = 0;
+end
+
+
+if hasHold,
+    
     out.processingLog(nlog+1) = {['Zero-order hold scans replaced with ' replaceWith '.']};
 
 else
    
     disp('No zero-order hold points found.')
-
-    nlog = length(in.processingLog);
 
     out.processingLog(nlog+1) = {'No zero-order hold points found.'};
 
