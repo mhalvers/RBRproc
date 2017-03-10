@@ -83,6 +83,13 @@ for k=1:length(binCenter),
 end
 
 
-nlog = length(out.processingLog);
+%% append processing log
+
+if isfield(in,'processingLog');
+  nlog = length(in.processingLog);
+else
+  nlog = 0;
+end
+
 out.processingLog(nlog+1) = {['Data binned by ' by ' to ' num2str(binWidth) ...
                     ' ' unit ' intervals']};
