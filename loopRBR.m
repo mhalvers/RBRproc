@@ -14,16 +14,16 @@ function out = loopRBR(in,replaceWith)
 %
 %
 % loopRBR identifies scans for which the data is likely of poor
-% quality because of slow descent rates and decelaration.  In such
-% situtiaons, the hydrodynamic wake downstream of the profiler can
+% quality because of slow descent rates and deceleration.  In such
+% situations, the hydrodynamic wake downstream of the profiler can
 % catch up and distort the measurements.  Slow descent rates or
-% decelarations are often caused by ship heave, especially when the
-% instrument is being lowered by a winch (ie, not free falling).
+% deceleration's are often caused by ship heave, especially when the
+% instrument is being lowered by a winch (i.e., not free falling).
 % 
 % The Hakai RBR descent rate working group found that density
-% inversions typically occured during periods of slow descent rate and
+% inversions typically occurred during periods of slow descent rate and
 % deceleration.  In particular, the data were suspect when the
-% following critera were met:
+% following criteria were met:
 %
 %  The deceleration falls below -0.1 m/s^2 AND ...
 %  the drop speed falls below 0.4 m/s.
@@ -77,7 +77,7 @@ kk = kk | out.DescentRate < 0; % also toss extreme cases when CTD loops
 %% apply the flag to the sensor data
 
 % first develop a list of sensors
-% vars = out.channls;
+% vars = out.channels;
 
 
 
