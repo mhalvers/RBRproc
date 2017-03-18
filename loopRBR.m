@@ -14,6 +14,7 @@ function out = loopRBR(in,replaceWith,minDescentRate,minAccelRate)
 %    replaceWith   : Switch specifying how to treat the flagged values:
 %                  :     'interp'   - linear interpolation over flagged values
 %                  :     'NaN'      - replace flagged values with NaN
+%                  :     'remove'   - remove data
 %                
 %    minDescentRate: Threshold descent rate.  Data below this threshold
 %                    are flagged and replaced with a NaN or an 
@@ -114,33 +115,38 @@ end
 
 
 % get all fieldnames
-vars = fieldnames(in);
+vars = fieldnames(out);
 
 % find the ones that are from sensors (or derived quantities)
-jj = structfun(@(x) numel(x),in)==length(in.mtime);
+jj = structfun(@(x) numel(x),out)==length(out.mtime);
 vars = vars(jj);
 
-% we don't want to flag pressure, depth, or time
-vars = vars(~strcmp(vars,{'mtime'}));
-vars = vars(~strcmp(vars,{'Pressure'}));
-vars = vars(~strcmp(vars,{'Depth'}));
-vars = vars(~strcmp(vars,{'DescentRate'}));
-vars = vars(~strcmp(vars,{'AccelRate'}));
-
+% we don't want to flag and treat pressure, depth, or time unless the
+% choice is to remove the data
+if strcmp(replaceWith,'interp') | strcmp(replaceWith,'NaN'),
+  keep = {'mtime' 'Pressure' 'Depth' 'DescentRate' 'AccelRate'};  
+  vars = vars(~ismember(vars,keep));
+end
 
 for j = 1:length(vars),
 
     switch replaceWith
         
       case 'NaN'
+
         out.(vars{j})(kk) = NaN;
         
       case 'interp'
         
-        tvar = in.(vars{j});
+        tvar = out.(vars{j});
         
-        out.(vars{j}) = interp1(in.mtime(~kk),tvar(~kk),in.mtime);
+        out.(vars{j}) = interp1(out.mtime(~kk),tvar(~kk),out.mtime);
     
+      case 'remove'
+        
+        tvar = out.(vars{j});
+        out.(vars{j}) = tvar(~kk);
+        
     end
     
 end
