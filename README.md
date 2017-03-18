@@ -70,9 +70,9 @@ profile = filterRBR(profile,{'Temperature','Conductivity'},3);
 % lag conductivity by 0.33 seconds (2 scans at 6 Hz) to reduce salinity spiking
 profile = alignRBR(profile,'Conductivity',-2/6);
 
-% Identify scans when the descent rate and deceleration were such that
-% hydrodynamic wake may have contaminated the data, and replace with `NaN`.
-profile = loopRBR(profiles,'NaN');
+% Identify scans when the descent rate was below 50 cm/s data, and
+% replace with `NaN`.
+profile = loopRBR(profiles,'NaN',0.5);
 
 % now calculate practical salinity
 profile = rmfield(profile,'Salinity'); % remove RBR's calculation
@@ -93,13 +93,9 @@ profile = binRBR(profile,'pressure',1);
 
 1. Implement better input handling.
 
-2. Improve the cast detection in `rbrExtractVals.m`.
+2. Improve the cast detection in `rbrExtractVals.m` by using
+   RSKreadprofiles.
 
-3. Decide on where to implement upcast and downcast delineation.
-Possibilities include `trimRBR.m`, `rbrExtractVals.m`, or perhaps a
-new function.  Use the 'profiles' field, if it exists, to determine
-the upcast and downcast.
-
-4. Modify `despikeRBR.m` to operate on blocks of data instead of full
+3. Modify `despikeRBR.m` to operate on blocks of data instead of full
 profile.
 
