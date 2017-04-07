@@ -66,11 +66,12 @@ end
 
 for m=1:castno,
 
-  out(m).samplingPeriod = seconds(in.schedules.samplingPeriod/1000);
   out(m).fileName = in.deployments.name;
   out(m).serialID = num2str(in.instruments.serialID);
   out(m).model = in.instruments.model;
-
+  out(m).samplingPeriod = seconds(in.schedules.samplingPeriod/1000);
+  out(m).channels = {in.channels.longName};
+  out(m).units = {in.channels.units};
 
   if isProfile,
     out(m).mtime = in.profiles.(castdir).data(m).tstamp;
@@ -87,11 +88,6 @@ for m=1:castno,
       out(m).(vars{k}) = in.data.values(:,k);
     end 
     
-  end
-
-  units = {in.channels.units};
-  for k=1:length(units),
-    out(m).units.(vars{k}) = units(k);
   end
 
 
