@@ -14,6 +14,11 @@ function casts = rbrExtractVals(profile);
 %
 % In the future rbrExtractVals might be altered to identify the
 % upcasts and downcasts, and provide indices to extract them.
+%
+% ******* Note this function is more-or-less deprecated in favour of
+%         the flattenRSK.m % Might still be useful for cast detection,
+%         however.  (MH - April 6 2017).
+% 
 
 
 % for testing
