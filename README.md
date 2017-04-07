@@ -7,9 +7,9 @@ parameters are tuned for RBR profilers.
 
 At the moment the toolbox is designed to use RBR's RSKtools Matlab
 toolbox to read raw 'rsk' sqlite files.  The output structure from
-RSKtools is then converted into a more convenient multidimensional
-structure.  This structure is then used as input to the various
-RBRproc processing routines.
+RSKtools is then converted into a more convenient structure.  This
+structure is then used as input to the various RBRproc processing
+routines.
 
 For RBR loggers which output hexadecimal files, one could also read
 any one of the Ruskin outputs (mat, txt, Excel, etc) into Matlab.
@@ -37,14 +37,17 @@ Bleeding edge development version:
 
 ## Example usage
 
+In this example we will read an rsk file and extract the downcasts
+using functions in RSKtools, and then perform some basic processing
+with RBRproc.
+
 ```matlab
 % read logger data into Matlab using RSKtools
-rsk = RSKopen(rskfile);
-rsk = RSKreaddata(rsk);
+rsk = RSKopen('/full/path/to/rskfile');
+rsk = RSKreadprofiles(rsk,[],'down');
 
-% recast things into a friendly 1 x Ncast structure. casts are determined
-% by finding large gaps in the time stamps
-profiles = rbrExtractVals(rsk); 
+% recast things into a 1 x Ncast structure with easy-to-access fields.
+rbr = flattenRSK(rsk);
 
 % plot a time series of pressure to see the profiles
 plot(cat(1,profiles.mtime),cat(1,profiles.Pressure)-10.1325,'.-')
@@ -56,8 +59,12 @@ arrayfun(@(x) max(x.Pressure),profiles)
 % extract the 4th profile for this example
 profile = profiles(4);
 
-% subtract atmospheric pressure from total pressure
-patm = 9.5;
+% add coordinates to structure
+profile.Latitude = 52;
+profile.Longitude = -129;
+
+% subtract custom atmospheric pressure from total pressure
+patm = 9.9; % say a mid-latitude low pressure system was passing by 
 profile = rmPatmRBR(profile,patm);
 
 % despike the fluorometer and turbidity profiles.  Use an 11 point
@@ -67,12 +74,13 @@ profile = despikeRBR(profile,{'Chlorophyll','Turbidity'},'median',11,'NaN');
 % low pass filter (filtfilt) T/C with running 3 pt triangular window
 profile = filterRBR(profile,{'Temperature','Conductivity'},3);
 
-% lag conductivity by 0.33 seconds (2 scans at 6 Hz) to reduce salinity spiking
+% lag conductivity by 0.33 seconds (2 scans at 6 Hz) to reduce
+% salinity spiking 
 profile = alignRBR(profile,'Conductivity',-2/6);
 
 % Identify scans when the descent rate was below 50 cm/s data, and
 % replace with `NaN`.
-profile = loopRBR(profiles,'NaN',0.5);
+profile = loopRBR(profile,'NaN',0.5);
 
 % now calculate practical salinity
 profile = rmfield(profile,'Salinity'); % remove RBR's calculation
@@ -93,9 +101,10 @@ profile = binRBR(profile,'pressure',1);
 
 1. Implement better input handling.
 
-2. Improve the cast detection in `rbrExtractVals.m` by using
-   RSKreadprofiles.
-
-3. Modify `despikeRBR.m` to operate on blocks of data instead of full
+2. Modify `despikeRBR.m` to operate on blocks of data instead of full
 profile.
 
+3. Make trimRBR not suck.
+
+4. Depth vector has the incorrect length when it is calculated by
+loopRBR, but then binned by pressure.
