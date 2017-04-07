@@ -59,8 +59,13 @@ out = in;
 
 % Check if Depth exists.  Calculate if not.
 if ~isfield(in,'Depth'),
-  out.Depth = -gsw_z_from_p(out.Pressure,out.Latitude);
-  out.units(end+1) = {'m'};
+  if ~isfield(out,'Latitude'),
+    error(['Latitude required to calculate depth.  Specify latitude ' ...
+           'in input structure.  e.g., ''in.Latitude = DD.DDD'''])
+  else
+    out.Depth = -gsw_z_from_p(out.Pressure,out.Latitude);
+    out.units(end+1) = {'m'};
+  end
 end
 
 %% Calculate descent rate
