@@ -69,7 +69,11 @@ for m=1:castno,
   out(m).fileName = in.deployments.name;
   out(m).serialID = num2str(in.instruments.serialID);
   out(m).model = in.instruments.model;
-  out(m).samplingPeriod = seconds(in.schedules.samplingPeriod/1000);
+  try 
+    out(m).samplingPeriod = seconds(in.schedules.samplingPeriod/1000);
+  catch
+    out(m).samplingPeriod = seconds(in.continuous.samplingPeriod/1000);  
+  end
   out(m).channels = {in.channels.longName};
   out(m).units = {in.channels.units};
 
