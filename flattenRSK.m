@@ -15,19 +15,26 @@ function out = flattenRSK(in);
 %      in          : structure of rbr data (i.e., output from 
 %                  : RSKreadata or RSKreadprofiles)
 %
-%  Mark Halverson  06/Apr/2017
+%  Mark Halverson  18/Apr/2017
 
 
 %% does the structure come from RSKreaddata or RSKreadprofiles?
+
 if isfield(in,'profiles'),
-  isProfile = logical(1);
+
   isDown = isfield(in.profiles.downcast,'data');
   isUp = isfield(in.profiles.upcast,'data');
+
+  isProfile = isDown | isUp; % catches instance when there are
+                             % profile events but not profile data
   
   if isDown,castdir='downcast';end
   if isUp,castdir='upcast';end
+
 else
-  isProfile = logical(0);
+
+    isProfile = logical(0);
+
 end
 
 
