@@ -19,13 +19,17 @@ function out = flattenRSK(in);
 
 
 %% does the structure come from RSKreaddata or RSKreadprofiles?
-isDown = isfield(in.profiles.downcast,'data');
-isUp = isfield(in.profiles.upcast,'data');
+if isfield(in,'profiles'),
+  isProfile = logical(1);
+  isDown = isfield(in.profiles.downcast,'data');
+  isUp = isfield(in.profiles.upcast,'data');
+  
+  if isDown,castdir='downcast';end
+  if isUp,castdir='upcast';end
+else
+  isProfile = logical(0);
+end
 
-isProfile = isDown | isUp;
-
-if isDown,castdir='downcast';end
-if isUp,castdir='upcast';end
 
 
 %% construct a list of channels
