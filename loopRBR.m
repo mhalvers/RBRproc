@@ -16,13 +16,14 @@ function out = loopRBR(in,replaceWith,minDescentRate,minAccelRate)
 %                  :     'NaN'      - replace flagged values with NaN
 %                  :     'remove'   - remove data
 %                
-%    minDescentRate: Threshold descent rate.  Data below this threshold
-%                    are flagged and replaced with a NaN or an 
-%                    interpolated value.
+%    minDescentRate: Threshold descent rate in m/s.  Data below this 
+%                    threshold are flagged and replaced with a NaN or 
+%                    an interpolated value.
 %
-%    minAccelRate  : (Optional) Threshold acceleration.  Data below this 
-%                    threshold are flagged and replaced with a NaN or an 
-%                    interpolated value.
+%    minAccelRate  : (Optional) Threshold acceleration in m/s^2.  Data 
+%                    below this threshold AND below the descent rate 
+%                    threshold are flagged and replaced with
+%                    a NaN or an interpolated value.  
 %
 %
 % loopRBR identifies scans for which the data is likely of poor
