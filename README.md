@@ -1,4 +1,24 @@
 # RBRproc
+## Jan 23, 2018 update:
+
+RBRproc was written before RSKtools, the RBR Ltd official Matlab
+software toolbox, had the ability to post-process RBR CTD data.
+RSKtools v2.0.0, released in July 2017, contains a number of functions
+for CTD data post-processing, and is now in my opinion a more useful
+toolbox than RBRproc.  Futhermore, as of v2.0.0, RSKtools stores
+profile data in a different manner than older versions, and RBRproc
+has not been updated to handle the changes.  Visit [this
+link](https://rbr-global.com/support/matlab-tools) to download
+RSKtools.
+
+RBRproc is still a useful way to handle CTD data in general, and so
+long as the CTD structure is formatted in a particular way, then
+RBRproc will work well (I still use it for Seabird CTD data and
+autonomous float data).
+
+-- Mark / Jan 23 2018
+
+## old header:
 
 RBRproc is a collection of Matlab routines designed to process RBR
 profiler data (e.g., RBR Concerto).  The approach here largely
