@@ -17,19 +17,19 @@ function out = binRBR(in,by,binWidth)
 
  
 %% for testing
-% in = profile; 
-% % by = 'depth';
+% in = sbe; 
+%  % by = 'depth';
 % by = 'pressure';
-% binWidth = 1;
+% binWidth = 10;
   
 
 %% develop a list of sensors to bin
 vars = fieldnames(in);
 ind = [];
 for k=1:length(vars),
-    if isnumeric(in.(vars{k})) & numel(in.(vars{k}))>1,
-        ind = [ind; k];
-    end
+  if isnumeric(in.(vars{k})) & numel(in.(vars{k}))>1,
+    ind = [ind; k];
+  end
 end
 vars = vars(ind);
 
